@@ -2,6 +2,7 @@ package pg
 
 import (
 	// "fmt"
+
 	"fmt"
 	"sipgrep/pkg/env"
 	"sipgrep/pkg/log"
@@ -10,7 +11,7 @@ import (
 	"time"
 
 	"github.com/prometheus/client_golang/prometheus"
-	"gorm.io/driver/postgres"
+	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 )
 
@@ -113,17 +114,15 @@ func Connect() {
 	var err error
 
 	dsn := fmt.Sprintf(
-		"host=%s user=%s dbname=%s port=%s sslmode=disable TimeZone=Asia/Shanghai",
-		env.Conf.DBAddr,
+		"%s:%s@tcp(%s:%s)/%s",
 		env.Conf.DBUser,
-		env.Conf.DBName,
+		env.Conf.DBPasswd,
+		env.Conf.DBAddr,
 		env.Conf.DBPort,
+		env.Conf.DBName,
 	)
 
-	db, err = gorm.Open(postgres.Open(dsn), &gorm.Config{
-		SkipDefaultTransaction: true,
-		PrepareStmt:            true,
-	})
+	db, err = gorm.Open(mysql.Open(dsn), &gorm.Config{})
 
 	if err != nil {
 		log.Fatalf("connect mysql error: %s", err)
